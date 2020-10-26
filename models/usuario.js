@@ -46,7 +46,6 @@ class Usuario {
             u.id = row.user_id;
             u.login = row.user_login;
             u.nome = row.user_nome;
-            u.perf_id = row.perf_id;
 
             const token = jwt.sign({ u }, process.env.JWT_SECRET, { expiresIn: 31536000 })
 
