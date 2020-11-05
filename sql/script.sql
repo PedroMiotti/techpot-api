@@ -22,7 +22,7 @@ USE `techSocial` ;
 -- Table `techSocial`.`user`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `techSocial`.`user` (
-  `user_id` INT NOT NULL,
+  `user_id` INT NOT NULL AUTO_INCREMENT,
   `user_name` VARCHAR(45) NOT NULL,
   `user_password` VARCHAR(256) NOT NULL,
   `user_mail` VARCHAR(45) NOT NULL,
@@ -40,7 +40,7 @@ ENGINE = InnoDB;
 -- Table `techSocial`.`group`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `techSocial`.`group` (
-  `group_id` INT NOT NULL,
+  `group_id` INT NOT NULL AUTO_INCREMENT,
   `group_name` VARCHAR(90) NOT NULL,
   `group_desc` VARCHAR(256) NOT NULL,
   `group_img` VARCHAR(256) NULL,
@@ -206,7 +206,7 @@ ENGINE = InnoDB;
 -- Table `techSocial`.`event`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `techSocial`.`event` (
-  `event_id` INT NOT NULL,
+  `event_id` INT NOT NULL AUTO_INCREMENT,
   `event_name` VARCHAR(45) NOT NULL,
   `event_desc` VARCHAR(90) NOT NULL,
   `event_dateInit` DATETIME NOT NULL,
@@ -365,3 +365,9 @@ ENGINE = InnoDB;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+
+
+
+-- MODIFIES
+-- ALTER TABLE user ADD emailConfirm TINYINT DEFAULT 0;

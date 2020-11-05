@@ -5,14 +5,18 @@
     const app = express();
     //Dotenv
     require('dotenv').config();
+
+
     //Models
-    const Usuario = require('./models/usuario');
-    const Grupo = require('./models/grupo');
-    const Evento = require('./models/evento');
+    const Usuario = require('./routes/usuario');
+    const Grupo = require('./routes/grupo');
+    const Evento = require('./routes/evento');
 
     
 // CONFIG
+    // Express body parser
     app.use(express.json());
+    app.use(express.urlencoded({ extended: true })); 
 
     // Usuario
     app.use('/usuario', Usuario);
