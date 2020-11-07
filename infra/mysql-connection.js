@@ -1,6 +1,7 @@
 // MySQL
 const mysql = require('mysql');
-require('dotenv').config;
+//Dotenv
+require('dotenv').config();
 
 // MySQl
 let pool = mysql.createPool({

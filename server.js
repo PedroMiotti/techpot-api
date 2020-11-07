@@ -5,6 +5,8 @@
     const app = express();
     //Dotenv
     require('dotenv').config();
+
+
     //Models
     const Usuario = require('./routes/usuario');
     const Grupo = require('./routes/grupo');
@@ -12,6 +14,7 @@
 
     
 // CONFIG
+    // Express body parser
     app.use(express.json());
     app.use(express.urlencoded({ extended: true })); 
 

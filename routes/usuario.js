@@ -27,8 +27,6 @@
     }
 
 
-
-
 // ROTAS
 
     // --> Efetuar login
@@ -36,7 +34,23 @@
 
         await Usuario.login(req.body.username, req.body.password, res)
 
-    })
+    });
+
+
+    // --> Criar Usuario
+    router.post("/criar", async (req, res) => {
+        let u = req.body;
+        
+        await Usuario.createUser(u, res);
+
+    });
+
+    // --> Confirmar E-mail
+    router.post("/confirm-email/:token"), async (req, res) => {
+
+
+
+    }
 
 
 
