@@ -25,23 +25,22 @@ const transporter = nodemailer.createTransport({
 })
 
 transporter.use('compile', hbs({
-    viewEngine: { extName: '.handlebars', partialsDir: '../views/partials' },
-    viewPath: '../views/partials',
-    layoutsDir: '../views/layout',
+    viewEngine: { extName: '.handlebars', partialsDir: path.resolve(__dirname, "../views/partials"), defaultLayout: false },
+    viewPath: path.resolve(__dirname, "../views/partials"),
+    layoutsDir: path.resolve(__dirname, '../views/layout'),
 }))
-
 
 const sendConfirmationEmail = (emailUsuario) => {
 
-    const emailToken = jwt.sign({emailUsuario}, jwtSecret.emailSecret, {expiresIn: 86400}) // Criando Token
+    const emailToken = jwt.sign({ emailUsuario } , process.env.JWT_EMAIL_SECRET, {expiresIn: 86400}) // Criando Token
 
-    const urlEmail = `http://localhost:8085/usuario/confirmacao/${emailToken}` // Criando url para o usuario clicar
+    const urlEmail = `http://localhost:4000/usuario/confirmacao/${emailToken}` // Criando url para o usuario clicar
 
     const emailImagePath = path.join(__dirname, '../assets/img/email.png')
    
     // info dentro do email
     const ConfirmacaoEmail = {
-        from: 'pedromiotti7@gmail.com',
+        from: process.env.EMAIL_USER,
         to: emailUsuario,
         subject: 'Confirmacao de email',
         template: 'confirmationEmail',
@@ -62,7 +61,7 @@ const sendConfirmationEmail = (emailUsuario) => {
             console.log(error)
         }
         else{
-            console.log('Email enviado com sucesso' + info.response)
+            console.log('Email enviado com sucesso -- ' + info.response)
         }
 
     })

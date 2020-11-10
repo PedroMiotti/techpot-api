@@ -11,7 +11,9 @@
     const bcrypt = require('bcryptjs');
     // SQL
     const Sql = require('../infra/sql');
-
+    //Helpers
+    const sendConfirmationEmail = require('../helpers/AuthEmail');
+ 
 
 class Usuario {
     constructor(id, nome, bio, email, senha, img ,ocupacao, linkedin, github, instagram){
@@ -28,28 +30,40 @@ class Usuario {
     }
 
 
+    // --> Gerar token 
+    static genToken(id, nome){
+
+        let u = new Usuario;
+        u.id = id;
+        u.nome = nome;
+
+        const token = jwt.sign({ u }, process.env.JWT_SECRET, { expiresIn: 31536000 })
+
+        return token;
+
+    }
+
+ 
 
     // --> Efetuar login
-    static async login(usuario, senha, res){
+    static async login(email, senha, res){
 
-        if(!usuario || !senha) return res.status(400).send({message : "Usuário ou senha inválidos ! :("});
+        if(!email || !senha) return res.status(400).send({message : "Usuário ou senha inválidos ! :("});
+
         
         await Sql.conectar(async (sql) => {
 
-            let resp = await sql.query("QUERY", [usuario]);
+            let resp = await sql.query("SELECT user_id, user_name, user_password FROM user WHERE user_mail = ? ", [email]);
             let row = resp[0];
 
+            
             if(!resp || !resp.length) return res.status(400).send({message : "Usuário ou senha inválidos ! :("})
 
 
-            const validPassword = await bcrypt.compare(senha, row.user_senha)
+            const validPassword = bcrypt.compare(senha, row.user_password);
             if (!validPassword) return res.status(400).send({message : "Usuário ou senha inválidos ! :("});
 
-            let u = new Usuario;
-            u.id = row.user_id;
-            u.nome = row.user_nome;
-
-            const token = jwt.sign({ u }, process.env.JWT_SECRET, { expiresIn: 31536000 })
+            const token = Usuario.genToken(row.user_id, row.user_name);
 
             return res.status(200).send({ token })
 
@@ -60,44 +74,67 @@ class Usuario {
     // --> Criar usuario
     static async createUser(u, res) {
 
-        // TODO --> Form validation
-        // TODO --> Email validation ( Front ? )
-        // TODO --> Check if email exists on DB
-        // TODO --> Password validation ( Front ? )
+        /*
 
+            TODO --> Form validation
+            TODO --> Email validation ( Front ? )
+            TODO --> Check if email exists on DB and treat duplicate error
+            TODO --> Password validation ( Front ? )
+            TODO --> Send error message if the email is not found -- Error: No recipients defined (NodeMailer error)
+            ? REQUIRED FIELDS --> Nome, sobrenome, email, senha;
+
+        */
 
         let message;
+        let statusCode;
+        let token;
+        let hash;
         
+
         await Sql.conectar(async (sql) => {
-            
             try{
-                bcrypt.hash(u.senha, parseInt(process.env.SALT_ROUNDS), async function(err, hash){
-                    if(err) throw err;
-                        
-                    await sql.query("INSERT INTO user (user_name, user_password, user_mail, user_img, user_bio, user_job, user_git, user_linkedin, user_instagram) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", [u.nome, hash, u.email, 1, u.bio, u.ocupacao, u.github, u.linkedin, u.instagram ])        
+
+                let hash = bcrypt.hashSync(u.senha, parseInt(process.env.SALT_ROUNDS));
+  
+                await sql.query("INSERT INTO user (user_name, user_password, user_mail, user_img, user_bio, user_job, user_git, user_linkedin, user_instagram) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", [u.nome, hash, u.email, 1, u.bio, u.ocupacao, u.github, u.linkedin, u.instagram ])        
+
+                sendConfirmationEmail(u.email);
+
+                token = Usuario.genToken(sql.lastInsertedId, u.nome); 
+                statusCode = 201;
+                message = `Bem vindo a comunidade TECH ${u.nome} !`;
+                
+                
+            }catch (e) {
+                if (e.code && e.code === "ER_DUP_ENTRY"){
                     
-                    // TODO --> Send confirmation email
-        
-                });
+                    message = `Opsss, o email ${u.email} já está em uso, deseja fazer login ou recuperar sua senha ?`;
+                    token = null;
+                    statusCode = 400;
+                }
+                
+                else{
+                    throw e; 
+                }
             }
-            catch (e) {
-				if (e.code) {
-					switch (e.code) {
-						case "ER_DUP_ENTRY":
-                            message = `O email ${u.email} já está em uso, deseja recuperar sua senha ?`;
-                            return res.status(400).send({ message })
-							
-						default:
-							throw e;
-					}
-				} else {
-					throw e;
-				}
-            }
+                
+            return res.status(statusCode).send({ token, message });
+        });
 
-            return res.status(201).send({ message: `Usuário criado com sucesso ! ` })
+    }
+ 
+    // --> Excluir conta
+    static async deleteAccount(res, id){
+
+        if(!id) return res.status(400).send({message: "Usuário não encontrado !"});
+
+        await Sql.conectar(async(sql) => {
+            await sql.query("DELETE FROM usuario WHERE user_id = ? ", [id]);
+
+            if(sql.linhasAfetadas === 0) return res.status(400).send({message : "Usuário não encontrado !"})
+
+            return res.status(200).send({ message: "Usuário excluido com successo !"})
         })
-
 
     }
 

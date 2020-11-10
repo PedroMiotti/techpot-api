@@ -86,6 +86,8 @@ module.exports = class Sql {
                 }
 
                 this.linhasAfetadas = parseInt(results.affectedRows);
+                this.lastInsertedId = parseInt(results.insertId);
+                
                 resolve(results);
 
             };

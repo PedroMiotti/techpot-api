@@ -31,8 +31,9 @@
 
     // --> Efetuar login
     router.post("/login" , async (req, res) => {
+        let u = req.body;
 
-        await Usuario.login(req.body.username, req.body.password, res)
+        await Usuario.login(u.email, u.senha, res)
 
     });
 
@@ -41,6 +42,7 @@
     router.post("/criar", async (req, res) => {
         let u = req.body;
         
+        console.log(req.body);
         await Usuario.createUser(u, res);
 
     });
