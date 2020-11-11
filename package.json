@@ -20,11 +20,6 @@
     "nodemailer-express-handlebars": "^4.0.0"
   },
   "devDependencies": {
-<<<<<<< HEAD
     "nodemon": "^2.0.4"
-=======
-    "dotenv": "^8.2.0",
-    "nodemon": "^2.0.6"
->>>>>>> 850b341ac0dbdd79d7f1faaee18d5ecbc9faa1ba
   }
 }
