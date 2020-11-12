@@ -257,6 +257,27 @@ class Evento {
         });
     }
 
+    //listar todas as categorias disponiveis
+    static async listarCategorias(res){
+        let lista = [];
+
+        await Sql.conectar(async (sql) =>{
+            try{
+                lista = await sql.query("select category_name from event_category;");
+            }
+            catch(err){
+                return res.status(400).send({
+                    message: `Erro ao listar categorias: ${err}`
+                })
+
+            }
+
+            return res.status(201).send( lista );  
+             
+
+        });
+
+    }
 
 
 }

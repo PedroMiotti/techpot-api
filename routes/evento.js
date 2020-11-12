@@ -8,12 +8,18 @@
     //MODEL
     const Evento = require('../models/evento');
 
+
+    //listar as categorias disponiveis
+    router.get("/listar-categorias", async (req, res) =>{
+        await Evento.listarCategorias(res);
+    })
+    
     //listar eventos
     router.get("/listar", async (req, res) => {
         await Evento.listarEventos(res);
     });
 
-    //listar eventos category
+    //listar eventos por categoria
     router.get("/listar/:catId", async (req, res) => {
         await Evento.listarEventosCategoria(req.params.catId, res);
     });
@@ -63,6 +69,8 @@
     router.put("/:idEvento/aceitar-convite/:idUsuario", async (req, res) =>{
         await Evento.confirmarConvite(req.params.idEvento, req.params.idUsuario, res);
     })
+
+    
 
 
 
