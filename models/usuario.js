@@ -88,8 +88,6 @@ class Usuario {
         let message;
         let statusCode;
         let token;
-        let hash;
-        
 
         await Sql.conectar(async (sql) => {
             try{
@@ -98,7 +96,7 @@ class Usuario {
   
                 await sql.query("INSERT INTO user (user_name, user_password, user_mail, user_img, user_bio, user_job, user_git, user_linkedin, user_instagram) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", [u.nome, hash, u.email, 1, u.bio, u.ocupacao, u.github, u.linkedin, u.instagram ])        
 
-                sendConfirmationEmail(u.email);
+                //sendConfirmationEmail(u.email);
 
                 token = Usuario.genToken(sql.lastInsertedId, u.nome); 
                 statusCode = 201;
@@ -135,6 +133,36 @@ class Usuario {
 
             return res.status(200).send({ message: "Usuário excluido com successo !"})
         })
+
+    }
+
+
+    // --> Info Usuario 
+    static async infoUser(id, res){
+
+        if(!id) return res.status(400).send({message: "Usuário não encontrado !"});
+
+        await Sql.conectar(async(sql) => {
+            let resp = await sql.query("SELECT * FROM user WHERE user_id = ?", [id]);
+            let row = resp[0];
+
+            if(!resp || !resp.length) return res.status(400).send({message : "Usuário ou senha inválidos ! :("})
+
+            let u = new Usuario;
+            u.nome = row.user_name;
+            u.bio = row.user_bio;
+            u.email = row.user_mail;
+            u.ocupacao = row.user_job;
+            u.github = row.user_git;
+            u.instagram = row.user_instagram;
+            u.linkedin = row.user_linkedin;
+
+
+            return res.status(200).send({ u })
+
+
+        })
+
 
     }
 
