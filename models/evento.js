@@ -22,7 +22,7 @@ class Evento {
         
     }
 
-    //atualizar evento
+    //atualizar evento - x
     static async atualizarEvento(e, res){
         await Sql.conectar(async (sql) => {
             try{
@@ -43,7 +43,7 @@ class Evento {
         
     };
 
-    //criar evento
+    //criar evento - x
     static async criarEvento(e, res){
         await Sql.conectar(async (sql) =>{ 
             try{
@@ -74,7 +74,7 @@ class Evento {
         
     }
 
-    //deletar evento
+    //deletar evento - x
     static async deletarEvento(id, res){
         await Sql.conectar(async (sql) =>{
             try{
@@ -99,7 +99,7 @@ class Evento {
         
 
 
-    //listar eventos - lista em ordem de data crescente.
+    //listar eventos - lista em ordem de data crescente. - x
     static async listarEventos(res){
         let lista = [];
 
@@ -123,7 +123,7 @@ class Evento {
         
     }
         
-    //listar inscritos de um evento 
+    //listar inscritos de um evento - x
     static async listarInscritos(id, res){
         let lista = [];
 
@@ -146,7 +146,7 @@ class Evento {
         
     }
 
-    //listar convidados de um evento 
+    //listar convidados de um evento - x
     static async listarConvidados(id, res){
         let lista = [];
 
@@ -169,7 +169,7 @@ class Evento {
         
     }
 
-    //listar TODAS as infos de um evento
+    //listar TODAS as infos de um evento - x
     static async listarInfo(id, res){
         let lista = [];
         await Sql.conectar(async (sql) => {
@@ -190,7 +190,7 @@ class Evento {
     }
 
 
-    //invitar usuario
+    //invitar usuario - x
     static async convidarUsuario(id_evento, id_usuario, res){
         await Sql.conectar(async (sql) =>{
             try{
@@ -211,7 +211,7 @@ class Evento {
         });
     }
 
-    //listar evento por categoria
+    //listar evento por categoria - x
     static async listarEventosCategoria(cat_id, res){
         let lista = [];
 
@@ -236,7 +236,7 @@ class Evento {
     }
 
 
-    //Confirmar Invite Evento
+    //Confirmar Invite Evento - x
     static async confirmarConvite(id_evento, id_usuario, res){
         await Sql.conectar(async (sql) =>{
             try{

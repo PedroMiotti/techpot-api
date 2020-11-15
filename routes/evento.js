@@ -35,6 +35,7 @@
 
         
         await Evento.criarEvento(e, res)
+        
     });
 
     //Atualizar Evento 
