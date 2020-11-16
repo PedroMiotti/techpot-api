@@ -15,7 +15,9 @@
     router.post("/login" , async (req, res) => {
         let u = req.body;
         
-        await Usuario.login(u.email, u.senha, res)
+        console.log(req.body)
+
+        // await Usuario.login(u.email, u.senha, res)
 
     });
 
