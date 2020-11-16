@@ -16,9 +16,10 @@
  
 
 class Usuario {
-    constructor(id, nome, bio, email, senha, img ,ocupacao, linkedin, github, instagram){
+    constructor(id, nome, sobrenome, bio, email, senha, img ,ocupacao, linkedin, github, instagram){
         this.id = id;
         this.nome = nome;
+        this.sobrenome = sobrenome;
         this.bio = bio;
         this.email = email;
         this.senha = senha;
@@ -94,7 +95,7 @@ class Usuario {
 
                 let hash = bcrypt.hashSync(u.senha, parseInt(process.env.SALT_ROUNDS));
   
-                await sql.query("INSERT INTO user (user_name, user_password, user_mail, user_img, user_bio, user_job, user_git, user_linkedin, user_instagram) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", [u.nome, hash, u.email, 1, u.bio, u.ocupacao, u.github, u.linkedin, u.instagram ])        
+                await sql.query("INSERT INTO user (user_name, user_surname,user_password, user_mail, user_img, user_bio, user_job, user_git, user_linkedin, user_instagram) VALUES(?, ? ,?, ?, ?, ?, ?, ?, ?, ?)", [u.nome, u.sobrenome,hash, u.email, 1, u.bio, u.ocupacao, u.github, u.linkedin, u.instagram ])        
 
                 //sendConfirmationEmail(u.email);
 
@@ -150,8 +151,9 @@ class Usuario {
 
             let u = new Usuario;
             u.nome = row.user_name;
+            u.sobrenome = row.user_surname;
             u.bio = row.user_bio;
-            u.email = row.user_mail;
+            u.email = row.user_mail;    
             u.ocupacao = row.user_job;
             u.github = row.user_git;
             u.instagram = row.user_instagram;
