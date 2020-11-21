@@ -24,6 +24,7 @@
     router.post("/criar", async (req, res) => {
         let u = req.body;
 
+        // console.log(req.body);
         await Usuario.createUser(u, res);
 
     });
@@ -38,9 +39,7 @@
     // --> Editar usuario
     router.post("/editar", async (req, res) => {
         let u = req.body;
-
-        console.log(u)
-        // await Usuario.updateUser(u, res);
+        await Usuario.updateUser(u, res);
 
     })
 
