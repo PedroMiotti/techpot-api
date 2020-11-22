@@ -30,9 +30,9 @@
     });
 
     // --> Info Usuario
-    router.post("/info", async( req, res) => {
-        let id = req.body.id;
-
+    router.get("/info/:id", async( req, res) => {
+        let id = req.params.id;
+        
         await Usuario.infoUser(id, res);
     })
 
