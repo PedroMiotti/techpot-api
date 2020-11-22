@@ -8,25 +8,24 @@
 
 
 class Evento {
-    constructor(id, nome, descricao, data_inicio, categoriaId, data_fim,  imagemUrl){
+    constructor(id, nome, descricao, data_inicio, categoriaId, tipoId, data_fim,  imagemUrl){
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.data_inicio = data_inicio;
         this.categoriaId = categoriaId;
+        this.tipoId = tipoId;
         //atributos não obrigatorios
         this.data_fim = data_fim;
         this.imagemUrl = imagemUrl;
         
-
-        
     }
 
-    //atualizar evento - x
+    //atualizar evento 
     static async atualizarEvento(e, res){
         await Sql.conectar(async (sql) => {
             try{
-                await sql.query("UPDATE Event SET event_name = ?, event_desc = ?, event_dateInit = ?, event_img = ?, category_id = ?, event_dateEnd = ? WHERE event_id = ?", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, e.categoriaId, e.data_fim, e.id]);
+                await sql.query("UPDATE Event SET event_name = ?, event_desc = ?, event_dateInit = ?, event_img = ?, category_id = ?, event_dateEnd = ?, eventType_id = ?, WHERE event_id = ?", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, e.categoriaId, e.data_fim, e.tipoId, e.id]);
             }
             catch(err){
                 return res.status(400).send({
@@ -43,12 +42,12 @@ class Evento {
         
     };
 
-    //criar evento - x
+    //criar evento
     static async criarEvento(e, res){
         await Sql.conectar(async (sql) =>{ 
             try{
 
-                await sql.query("INSERT INTO event (event_name, event_desc, event_dateInit, event_img, category_id, event_dateEnd) VALUES (?, ?, ?, ?, ?, ?)", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, e.categoriaId, e.data_fim]);
+                await sql.query("INSERT INTO event (event_name, event_desc, event_dateInit, event_img, category_id, event_dateEnd, eventType_id) VALUES (?, ?, ?, ?, ?, ?, ?)", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, e.categoriaId, e.data_fim, e.tipoId]);
 
             }catch(err){
 
@@ -74,7 +73,7 @@ class Evento {
         
     }
 
-    //deletar evento - x
+    //deletar evento
     static async deletarEvento(id, res){
         await Sql.conectar(async (sql) =>{
             try{
@@ -99,7 +98,7 @@ class Evento {
         
 
 
-    //listar eventos - lista em ordem de data crescente. - x
+    //listar eventos - lista em ordem de data crescente. 
     static async listarEventos(res){
         let lista = [];
 
@@ -123,7 +122,7 @@ class Evento {
         
     }
         
-    //listar inscritos de um evento - x
+    //listar inscritos de um evento 
     static async listarInscritos(id, res){
         let lista = [];
 
@@ -146,7 +145,7 @@ class Evento {
         
     }
 
-    //listar convidados de um evento - x
+    //listar convidados de um evento 
     static async listarConvidados(id, res){
         let lista = [];
 
@@ -169,7 +168,7 @@ class Evento {
         
     }
 
-    //listar TODAS as infos de um evento - x
+    //listar TODAS as infos de um evento 
     static async listarInfo(id, res){
         let lista = [];
         await Sql.conectar(async (sql) => {
@@ -190,7 +189,7 @@ class Evento {
     }
 
 
-    //invitar usuario - x
+    //invitar usuario 
     static async convidarUsuario(id_evento, id_usuario, res){
         await Sql.conectar(async (sql) =>{
             try{
@@ -211,7 +210,7 @@ class Evento {
         });
     }
 
-    //listar evento por categoria - x
+    //listar evento por categoria 
     static async listarEventosCategoria(cat_id, res){
         let lista = [];
 
@@ -236,7 +235,7 @@ class Evento {
     }
 
 
-    //Confirmar Invite Evento - x
+    //Confirmar Invite Evento 
     static async confirmarConvite(id_evento, id_usuario, res){
         await Sql.conectar(async (sql) =>{
             try{
@@ -263,7 +262,7 @@ class Evento {
 
         await Sql.conectar(async (sql) =>{
             try{
-                lista = await sql.query("select category_name from event_category;");
+                lista = await sql.query("select category_id, category_name from event_category;");
             }
             catch(err){
                 return res.status(400).send({
@@ -277,6 +276,23 @@ class Evento {
 
         });
 
+    }
+
+    static async listarTipos(res){
+        let lista = [];
+
+        await Sql.conectar(async (sql) =>{
+            try{
+                lista = await sql.query("select eventType_id, eventType_name from event_type;");
+            }
+            catch(err){
+                return res.status(400).send({
+                    message: `Erro ao listar tipo de eventos: ${err}`
+                })
+            }
+
+            return res.status(201).send( lista );
+        });
     }
 
 

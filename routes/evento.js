@@ -13,6 +13,11 @@
     router.get("/listar-categorias", async (req, res) =>{
         await Evento.listarCategorias(res);
     })
+
+    //listar tipos de eventos disponíveis
+    router.get("/listar-tipos", async(req, res) =>{
+        await Evento.listarTipos(res);
+    })
     
     //listar eventos
     router.get("/listar", async (req, res) => {
@@ -32,8 +37,6 @@
     //Criar Evento - 
     router.post("/criar", async (req, res) =>{
         let e = req.body;
-
-        
         await Evento.criarEvento(e, res)
         
     });
