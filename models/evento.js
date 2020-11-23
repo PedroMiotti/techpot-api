@@ -8,7 +8,7 @@
 
 
 class Evento {
-    constructor(id, nome, descricao, data_inicio, categoriaId, tipoId, data_fim,  imagemUrl){
+    constructor(id, nome, descricao, data_inicio, categoriaId, tipoId, data_fim,  imagemUrl, criador){
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -18,6 +18,7 @@ class Evento {
         //atributos não obrigatorios
         this.data_fim = data_fim;
         this.imagemUrl = imagemUrl;
+        this.criador = criador;
         
     }
 
@@ -25,7 +26,7 @@ class Evento {
     static async atualizarEvento(e, res){
         await Sql.conectar(async (sql) => {
             try{
-                await sql.query("UPDATE Event SET event_name = ?, event_desc = ?, event_dateInit = ?, event_img = ?, category_id = ?, event_dateEnd = ?, eventType_id = ?, WHERE event_id = ?", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, e.categoriaId, e.data_fim, e.tipoId, e.id]);
+                await sql.query("UPDATE Event SET event_name = ?, event_desc = ?, event_dateInit = ?, event_img = ?, category_id = ?, event_dateEnd = ?, eventType_id = ?, event_creator_id = ? WHERE event_id = ?", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, e.categoriaId, e.data_fim, e.tipoId, e.criador, e.id]);
             }
             catch(err){
                 return res.status(400).send({
@@ -47,7 +48,7 @@ class Evento {
         await Sql.conectar(async (sql) =>{ 
             try{
 
-                await sql.query("INSERT INTO event (event_name, event_desc, event_dateInit, event_img, category_id, event_dateEnd, eventType_id) VALUES (?, ?, ?, ?, ?, ?, ?)", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, e.categoriaId, e.data_fim, e.tipoId]);
+                await sql.query("INSERT INTO event (event_name, event_desc, event_dateInit, event_img, category_id, event_dateEnd, eventType_id, event_creator_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, e.categoriaId, e.data_fim, e.tipoId, e.criador]);
 
             }catch(err){
 
@@ -104,7 +105,7 @@ class Evento {
 
         await Sql.conectar(async (sql) =>{
             try{
-                lista = await sql.query("SELECT event_id, event_name, event_dateInit, event_img FROM event ORDER BY event_dateInit ASC");
+                lista = await sql.query("SELECT event_id, event_name, event_dateInit, event_img, et.eventType_name FROM event e inner join event_type et on e.eventType_id = et.eventType_id ORDER BY event_dateInit ASC");
             }
             catch(err){
                 return res.status(400).send({
@@ -174,7 +175,7 @@ class Evento {
         await Sql.conectar(async (sql) => {
             
             try{
-                lista = await sql.query("SELECT * FROM Event WHERE event_id = ?", [id]);
+                lista = await sql.query("select event_id, event_name, event_desc, event_dateInit, event_img, category_id, event_dateEnd, e.eventType_id, event_creator_id, et.eventType_name from event e inner join event_type et on e.eventType_id = et.eventType_id  where event_id = ?;", [id]);
                 
             }
             catch(err){
