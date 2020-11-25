@@ -24,7 +24,6 @@
     router.post("/criar", async (req, res) => {
         let u = req.body;
 
-        // console.log(req.body);
         await Usuario.createUser(u, res);
 
     });

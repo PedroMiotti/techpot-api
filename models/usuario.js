@@ -44,8 +44,6 @@ class Usuario {
 
     }
 
-
-
     // --> Efetuar login
     static async login(email, senha, res) {
 
