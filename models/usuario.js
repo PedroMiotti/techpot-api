@@ -157,13 +157,9 @@ class Usuario {
             u.instagram = row.user_instagram;
             u.linkedin = row.user_linkedin;
 
-
             return res.status(200).send({ u })
 
-
         })
-
-
     }
 
 
