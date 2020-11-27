@@ -1,5 +1,6 @@
 "use strict";
 
+const e = require('express');
 // IMPORTS
     // Express
     const express = require('express');
@@ -8,7 +9,7 @@
 
 
 class Evento {
-    constructor(id, nome, descricao, data_inicio, categoriaId, tipoId, data_fim,  imagemUrl, criador){
+    constructor(id, nome, descricao, data_inicio, categoriaId, tipoId, tipoNome, data_fim,  imagemUrl, criadorId, criadorNome, criadorSobrenome, criadorJob){
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -18,7 +19,11 @@ class Evento {
         //atributos não obrigatorios
         this.data_fim = data_fim;
         this.imagemUrl = imagemUrl;
-        this.criador = criador;
+        this.criadorId = criadorId;
+        this.tipoNome = tipoNome;
+        this.criadorNome = criadorNome;
+        this.criadorSobrenome = criadorSobrenome;
+        this.criadorJob = criadorJob;
         
     }
 
@@ -26,7 +31,7 @@ class Evento {
     static async atualizarEvento(e, res){
         await Sql.conectar(async (sql) => {
             try{
-                await sql.query("UPDATE Event SET event_name = ?, event_desc = ?, event_dateInit = ?, event_img = ?, category_id = ?, event_dateEnd = ?, eventType_id = ?, event_creator_id = ? WHERE event_id = ?", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, e.categoriaId, e.data_fim, e.tipoId, e.criador, e.id]);
+                await sql.query("UPDATE Event SET event_name = ?, event_desc = ?, event_dateInit = ?, event_img = ?, category_id = ?, event_dateEnd = ?, eventType_id = ?, event_creator_id = ? WHERE event_id = ?", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, e.categoriaId, e.data_fim, e.tipoId, e.criadorId, e.id]);
             }
             catch(err){
                 return res.status(400).send({
@@ -45,10 +50,16 @@ class Evento {
 
     //criar evento
     static async criarEvento(e, res){
+        let message;
+        if(!e.nome || !e.descricao || !e.data_inicio){
+            message = `Erro: Preencha os campos obrigatórios`;
+            return res.status(400).send({ message })
+        }
+
         await Sql.conectar(async (sql) =>{ 
             try{
-
-                await sql.query("INSERT INTO event (event_name, event_desc, event_dateInit, event_img, category_id, event_dateEnd, eventType_id, event_creator_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, e.categoriaId, e.data_fim, e.tipoId, e.criador]);
+                
+                await sql.query("INSERT INTO event (event_name, event_desc, event_dateInit, event_img, category_id, event_dateEnd, eventType_id, event_creator_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, e.categoriaId, e.data_fim, e.tipoId, e.criadorId]);
 
             }catch(err){
 
@@ -171,21 +182,32 @@ class Evento {
 
     //listar TODAS as infos de um evento 
     static async listarInfo(id, res){
-        let lista = [];
+        
+        if(!id) return res.status(400).send({message: "Evento não encontrado"})
+
         await Sql.conectar(async (sql) => {
             
-            try{
-                lista = await sql.query("select event_id, event_name, event_desc, event_dateInit, event_img, category_id, event_dateEnd, e.eventType_id, event_creator_id, et.eventType_name from event e inner join event_type et on e.eventType_id = et.eventType_id  where event_id = ?;", [id]);
-                
-            }
-            catch(err){
-                return res.status(400).send({
-                    message: "Erro ao listar informações do evento"
-                })
+            let info = await sql.query("select event_id, event_name, event_desc, event_dateInit, event_img, e.category_id, ec.category_name,  event_dateEnd, e.eventType_id, event_creator_id, et.eventType_name, u.user_name, u.user_surname, u.user_job from event e inner join event_type et on e.eventType_id = et.eventType_id inner join event_category ec on ec.category_id = e.category_id inner join user u on u.user_id = e.event_creator_id where event_id = ?;", [parseInt(id)]);
+            let row = info[0];
 
-            }
+            if(!info || !info.length) return res.status(400).send({message: "Erro ao recuperar informações do evento"})
+            
+            let e = new Evento;
+            e.nome = row.event_name;
+            e.descricao = row.event_desc;
+            e.data_inicio = row.event_dateInit;
+            e.data_fim = row.event_dateEnd;
+            e.imagemUrl = row.event_img;
+            e.categoriaId = row.category_id;
+            e.categoriaNome = row.category_name
+            e.tipoId = row.eventType_id;
+            e.tipoNome = row.eventType_name;
+            e.criadorId = row.event_creator_id;
+            e.criadorNome = row.user_name;
+            e.criadorSobrenome = row.user_surname;
+            e.criadorJob = row.user_job;
 
-            return res.status(200).send(lista);
+            return res.status(200).send({e});
         })
     }
 
@@ -300,4 +322,4 @@ class Evento {
 }
 
 
-module.exports = Evento;
+module.exports = Evento; 
