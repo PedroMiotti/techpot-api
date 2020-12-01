@@ -1,52 +1,53 @@
 "use strict";
 
 // IMPORTS
-    // Express
-    const express = require('express');
-    const router = express.Router();
+// Express
+const express = require('express');
+const router = express.Router();
 
-    //MODEL
-    const Usuario = require('../models/usuario')
+//MODEL
+const Usuario = require('../models/usuario');
 
 
 // ROTAS
 
-    // --> Efetuar login
-    router.post("/login" , async (req, res) => {
-        let u = req.body;
+// --> Efetuar login
+router.post("/login", async (req, res) => {
+    let u = req.body;
 
-        await Usuario.login(u.email, u.senha, res)
+    await Usuario.login(u.email, u.senha, res)
 
-    });
-
-
-    // --> Criar Usuario
-    router.post("/criar", async (req, res) => {
-        let u = req.body;
-
-        await Usuario.createUser(u, res);
-
-    });
-
-    // --> Info Usuario
-    router.get("/info/:id", async( req, res) => {
-        let id = req.params.id;
-        
-        await Usuario.infoUser(id, res);
-    })
-
-    // --> Editar usuario
-    router.post("/editar", async (req, res) => {
-        let u = req.body;
-        await Usuario.updateUser(u, res);
-
-    })
-
-    // --> Confirmar E-mail
-    router.post("/confirm-email/:token"), async (req, res) => {}
+});
 
 
-    
+// --> Criar Usuario
+router.post("/criar", async (req, res) => {
+    let u = req.body;
+
+    await Usuario.createUser(u, res);
+
+});
+
+// --> Info Usuario
+router.get("/info/:id", async (req, res) => {
+    let id = req.params.id;
+
+    // await Usuario.infoUser(id, res);
+    await Usuario.infoUser(id, res);
+})
+
+// --> Editar usuario
+router.post("/editar", async (req, res) => {
+    let u = req.body;
+    await Usuario.updateUser(u, res);
+
+})
+
+// --> Confirmar E-mail
+router.post("/confirm-email/:token"), async (req, res) => { }
+
+
+
 
 
 
