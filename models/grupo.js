@@ -1,8 +1,9 @@
 'use strict';
 
-const { parseConnectionUrl } = require('nodemailer/lib/shared');
+// IMPORTS
+// SQL
 const Sql = require('../infra/sql.js');
-
+// Utils
 const format_date = require('../utils/format_date');
 
 class Grupo {

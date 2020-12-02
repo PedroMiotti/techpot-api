@@ -1,8 +1,6 @@
 "use strict";
 
 // IMPORTS
-// Express
-const express = require('express');
 //JWT
 const jwt = require('jsonwebtoken');
 //Dotenv
