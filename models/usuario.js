@@ -145,7 +145,7 @@ class Usuario {
             let resp = await sql.query("SELECT * FROM user WHERE user_id = ?", [id]);
             let row = resp[0];
 
-            if (!resp || !resp.length) return res.status(400).send({ message: "Usuário ou senha inválidos ! :(" })
+            if (!resp || !resp.length) return res.status(400).send({ message: "Usuário não encontrado !" })
 
             let u = new Usuario;
             u.nome = row.user_name;
