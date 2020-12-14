@@ -56,9 +56,9 @@ class Evento {
         await Sql.conectar(async (sql) => {
             try {
 
-                await sql.query("INSERT INTO event (event_name, event_desc, event_dateInit, event_img, category_id, event_dateEnd, eventType_id, event_creator_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, e.categoriaId, e.data_fim, e.tipoId, e.criadorId]);
+                await sql.query("INSERT INTO event (event_name, event_desc, event_dateInit, event_img, category_id, event_dateEnd, eventType_id, event_creator_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [e.nome, e.descricao, e.data_inicio, e.imagemUrl, parseInt(e.categoriaId), e.data_fim, parseInt(e.tipoId), e.criador]);
 
-            } catch (err) {
+            } catch (e) {
 
                 if (e.code) {
                     switch (e.code) {
@@ -185,7 +185,7 @@ class Evento {
 
         await Sql.conectar(async (sql) => {
 
-            let info = await sql.query("select event_id, event_name, event_desc, event_dateInit, event_img, e.category_id, ec.category_name,  event_dateEnd, e.eventType_id, event_creator_id, et.eventType_name, u.user_name, u.user_surname, u.user_job from event e inner join event_type et on e.eventType_id = et.eventType_id inner join Event_Category ec on ec.category_id = e.category_id inner join user u on u.user_id = e.event_creator_id where event_id = ?;", [parseInt(id)]);
+            let info = await sql.query("select event_id, event_name, event_desc, event_dateInit, event_img, e.category_id, ec.category_name,  event_dateEnd, e.eventType_id, event_creator_id, et.eventType_name, u.user_name, u.user_surname, u.user_job from event e inner join event_type et on e.eventType_id = et.eventType_id inner join event_category ec on ec.category_id = e.category_id inner join user u on u.user_id = e.event_creator_id where event_id = ?;", [parseInt(id)]);
             let row = info[0];
 
             if (!info || !info.length) return res.status(400).send({ message: "Erro ao recuperar informações do evento" })
@@ -283,7 +283,7 @@ class Evento {
 
         await Sql.conectar(async (sql) => {
             try {
-                lista = await sql.query("select category_id, category_name from Event_Category;");
+                lista = await sql.query("select category_id, category_name from event_category;");
             }
             catch (err) {
                 return res.status(400).send({

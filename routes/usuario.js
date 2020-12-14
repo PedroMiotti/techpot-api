@@ -32,7 +32,6 @@ router.post("/criar", async (req, res) => {
 router.get("/info/:id", async (req, res) => {
     let id = req.params.id;
 
-    // await Usuario.infoUser(id, res);
     await Usuario.infoUser(id, res);
 })
 

@@ -28,19 +28,19 @@ class Post {
 
         let message;
 
-        let date_now = format_date(new Date().toISOString());
-
         await Sql.conectar(async (sql) => {
 
             try {
                 
-                await sql.query("INSERT INTO post (post_body, post_body_html, post_data_criacao, user_id, group_id) VALUES (?, ?, ?, ?, ?)", [p.post_body, p.post_body_html, date_now, p.user_id, parseInt(p.group_id)]);
+                await sql.query("INSERT INTO post (post_body, post_body_html, user_id, group_id) VALUES (?, ?, ?, ?)", [p.post_body, p.post_body_html, p.user_id, parseInt(p.group_id)]);
                 
                 message = "Post criado com sucesso !";
             } 
 
             catch (e) {
-                throw e;
+                return res.status(400).send({
+                    message: `Erro ao listar posts: ${e}`
+                })
             }
 
             return res.status(201).send({ message });
@@ -57,7 +57,7 @@ class Post {
 
             try {
                 
-                lista = await sql.query(`SELECT p.post_id, p.post_body, p.post_body_html, p.post_data_criacao, g.group_name, u.user_name, u.user_surname
+                lista = await sql.query(`SELECT p.post_id, p.post_body, p.post_body_html, p.post_data_criacao, g.group_name, u.user_id,u.user_name, u.user_surname
                                 FROM post p
                                 INNER JOIN user u 
                                 ON p.user_id = u.user_id
@@ -70,7 +70,7 @@ class Post {
 
             catch (e) {
                 return res.status(400).send({
-                    message: `Erro ao listar posts: ${err}`
+                    message: `Erro ao listar posts: ${e}`
                 })
             }
 
@@ -89,7 +89,7 @@ class Post {
 
             try {
                 
-                lista = await sql.query(`SELECT p.post_id, p.post_body, p.post_body_html, p.post_data_criacao, g.group_name, u.user_name, u.user_surname
+                lista = await sql.query(`SELECT p.post_id, p.post_body, p.post_body_html, p.post_data_criacao, g.group_name, u.user_id, u.user_name, u.user_surname
                                         FROM post p
                                         INNER JOIN user u 
                                         ON p.user_id = u.user_id

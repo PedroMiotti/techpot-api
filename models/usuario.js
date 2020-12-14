@@ -85,6 +85,7 @@ class Usuario {
         let message;
         let statusCode;
         let token;
+        let firstAccess;
 
         await Sql.conectar(async (sql) => {
             try {
@@ -93,11 +94,12 @@ class Usuario {
 
                 await sql.query("INSERT INTO user (user_name, user_surname,user_password, user_mail, user_img, user_bio, user_job, user_git, user_linkedin, user_instagram) VALUES(?, ? ,?, ?, ?, ?, ?, ?, ?, ?)", [u.nome, u.sobrenome, hash, u.email, 1, u.bio, u.ocupacao, u.github, u.linkedin, u.instagram])
 
-                // sendConfirmationEmail(u.email);
+                sendConfirmationEmail(u.email);
 
                 token = Usuario.genToken(sql.lastInsertedId, u.nome);
                 statusCode = 201;
                 message = `Bem vindo a comunidade TECH ${u.nome} !`;
+                firstAccess = true;
 
 
             } catch (e) {
@@ -106,6 +108,7 @@ class Usuario {
                     message = `Opsss, o email ${u.email} já está em uso, deseja fazer login ou recuperar sua senha ?`;
                     token = null;
                     statusCode = 400;
+                    firstAccess = null;
                 }
 
                 else {
@@ -113,7 +116,7 @@ class Usuario {
                 }
             }
 
-            return res.status(statusCode).send({ token, message });
+            return res.status(statusCode).send({ token, message, firstAccess });
         });
 
     }
