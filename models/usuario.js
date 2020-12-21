@@ -165,27 +165,23 @@ class Usuario {
 
 
     // --> Editar Usuario
-    static async updateUser(u, res) {
+    static async updateUser(id, u, res) {
         let message;
         let statusCode;
         let token;
 
-        // if(!u.id) return res.status(400).send({message: "Usuário não encontrado !"});
+        if(!id) return res.status(400).send({message: "Usuário não encontrado !"});
+        // TODO --> Check if id exists
 
         await Sql.conectar(async (sql) => {
-            let id = parseInt(u.id);
-            await sql.query("UPDATE user SET user_name = ?, user_surname = ?, user_bio = ?, user_job= ?, user_git = ?, user_linkedin = ? WHERE user_id = ?", [u.nome, u.sobrenome, u.bio, u.ocupacao, u.github, u.linkedin, id]);
+            await sql.query("UPDATE user SET user_name = ?, user_surname = ?, user_bio = ?, user_job= ?, user_git = ?, user_linkedin = ? WHERE user_id = ?", [u.nome, u.sobrenome, u.bio, u.ocupacao, u.github, u.linkedin, parseInt(id)]);
 
-            token = Usuario.genToken(id, u.nome);
+            token = Usuario.genToken(parseInt(id), u.nome);
             statusCode = 200;
             message = "Usuario salvo com sucesso !";
 
-
             return res.status(200).send({ token, message })
-
-
         })
-
 
     }
 

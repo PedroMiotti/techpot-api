@@ -10,8 +10,6 @@ const Post = require('../models/post');
 
 
 // ROTAS
-
-
 // --> Criar Post
 router.post("/criar", async (req, res) => {
     let p = req.body;

@@ -7,8 +7,6 @@ require('dotenv').config();
 // SQL
 const Sql = require('../infra/sql');
 
-// Utils
-const format_date = require('../utils/format_date');
 
 
 class Post {

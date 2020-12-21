@@ -4,7 +4,7 @@
 // SQL
 const Sql = require('../infra/sql.js');
 // Utils
-const format_date = require('../utils/format_date');
+const format_date = require('../utils/format_date').default;
 
 class Grupo {
     constructor(id, nome, descricao, tipo_privacidade, foto, data_criacao, num_membros) {
@@ -54,12 +54,10 @@ class Grupo {
 
         let message;
 
-        let date_now = format_date(new Date().toISOString());
-
         await Sql.conectar(async (sql) => {
             try {
 
-                await sql.query('INSERT INTO group_pot (group_name, group_descricao, group_img, privacy_type_id, group_data_criacao) VALUES (?, ?, ?, ?, ?)', [g.nome, g.descricao, 1, parseInt(g.tipo_privacidade), date_now]);
+                await sql.query('INSERT INTO group_pot (group_name, group_descricao, group_img, privacy_type_id) VALUES (?, ?, ?, ?)', [g.nome, g.descricao, 1, parseInt(g.tipo_privacidade)]);
 
                 const id_grupo = await sql.scalar("SELECT last_insert_id()");
 

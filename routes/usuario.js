@@ -38,7 +38,10 @@ router.get("/info/:id", async (req, res) => {
 // --> Editar usuario
 router.post("/editar", async (req, res) => {
     let u = req.body;
-    await Usuario.updateUser(u, res);
+    let id = u.id;
+    let userInfo = u.userInfo;
+
+    await Usuario.updateUser(id, userInfo, res);
 
 })
 
