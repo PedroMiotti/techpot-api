@@ -23,7 +23,7 @@ router.post("/login", async (req, res) => {
 // --> Criar Usuario
 router.post("/criar", async (req, res) => {
     let u = req.body;
-
+    console.log(u);
     await Usuario.createUser(u, res);
 
 });
