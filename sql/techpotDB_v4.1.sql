@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS `techpotDB`.`group_membership` (
   `user_id` INT NOT NULL,
   `role_id` INT NULL,
   PRIMARY KEY (`group_id`, `user_id`),
+  INDEX `fk_group_membership_group_id_idx` (`group_id` ASC) ,
   INDEX `fk_group_membership_user_id_idx` (`user_id` ASC) ,
   INDEX `fk_group_membership_role_id_idx` (`role_id` ASC) ,
   CONSTRAINT `fk_group_membership_group_id`
