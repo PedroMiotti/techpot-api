@@ -13,7 +13,6 @@ const Post = require('../models/post');
 // --> Criar Post
 router.post("/criar", async (req, res) => {
     let p = req.body;
-
     await Post.createPost(p, res);
 
 })

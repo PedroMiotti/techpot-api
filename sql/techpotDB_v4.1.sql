@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS `techpotDB`.`post` (
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_post_group_id`
     FOREIGN KEY (`group_id`)
-    REFERENCES `techpotDB`.`group` (`group_id`)
+    REFERENCES `techpotDB`.`group_pot` (`group_id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
