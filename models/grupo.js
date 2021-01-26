@@ -30,10 +30,8 @@ class Grupo {
     await Sql.conectar(async (sql) => {
       try {
         lista = await sql.query(
-          `SELECT g.group_id, g.group_name, g.group_desc, g.group_img, p.privacy_type_name, m.membros
+          `SELECT g.group_id, g.group_name, g.group_desc, g.group_img, g.group_members_count ,p.privacy_type_name
                                         FROM group_pot g 
-                                        LEFT JOIN (SELECT group_id, COUNT(user_id) AS membros FROM group_membership GROUP BY group_id) m
-                                        ON g.group_id = m.group_id
                                         INNER JOIN group_privacy_type p  
                                         ON g.privacy_type_id = p.privacy_type_id 
                                         WHERE g.group_id IN (SELECT group_id FROM group_membership WHERE user_id = ? )`,
@@ -56,8 +54,8 @@ class Grupo {
     await Sql.conectar(async (sql) => {
       try {
         await sql.query(
-          "INSERT INTO group_pot (group_name, group_desc, group_img, privacy_type_id) VALUES (?, ?, ?, ?)",
-          [g.name, g.description, 1, parseInt(g.privacy_type)]
+          "INSERT INTO group_pot (group_name, group_desc, group_members_count, group_img, privacy_type_id) VALUES (?, ?, ?, ?, ?)",
+          [g.name, g.description, 1, 1,parseInt(g.privacy_type)]
         );
 
         const id_grupo = await sql.scalar("SELECT last_insert_id()");
@@ -85,14 +83,7 @@ class Grupo {
     if (!id) return res.status(400).send({ message: "Grupo não encontrado !" });
 
     await Sql.conectar(async (sql) => {
-      let resp = await sql.query(
-        `SELECT g.*, COUNT(user_id) AS membros
-                                        FROM group_pot g
-                                        INNER JOIN group_membership m
-                                        ON g.group_id = m.group_id
-                                        WHERE g.group_id = ?;`,
-        [id]
-      );
+      let resp = await sql.query('SELECT * FROM group_pot WHERE group_id = ?',[id]);
       let row = resp[0];
 
       if (!resp || !resp.length)
@@ -105,7 +96,7 @@ class Grupo {
       g.image = row.group_img;
       g.privacy_type = row.privacy_type_id;
       g.create_date = row.group_create_date;
-      g.num_members = row.membros;
+      g.num_members = row.group_members_count;
 
       return res.status(200).send({ g });
     });

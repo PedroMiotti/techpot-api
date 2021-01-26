@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS `techpotDB`.`group_pot` (
   `group_name` VARCHAR(45) NULL,
   `group_desc` VARCHAR(255) NULL,
   `group_img` VARCHAR(45) NULL,
+  `group_members_count` INT NULL,
   `privacy_type_id` INT NULL,
   `group_create_date` TIMESTAMP NOT NULL DEFAULT NOW(),
   PRIMARY KEY (`group_id`),
