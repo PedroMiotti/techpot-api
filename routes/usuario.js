@@ -11,6 +11,15 @@ const Usuario = require('../models/usuario');
 
 // ROTAS
 
+// --> Login CAS
+router.get("/login-cas", async (req, res) => {
+  let token = req.query.token;
+
+  await Usuario.loginCas(token, res);
+
+})
+
+
 // --> Efetuar login
 router.post("/login", async (req, res) => {
     let u = req.body;

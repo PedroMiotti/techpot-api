@@ -24,16 +24,20 @@ USE `techpotDB` ;
 CREATE TABLE IF NOT EXISTS `techpotDB`.`user` (
   `user_id` INT NOT NULL AUTO_INCREMENT,
   `user_name` VARCHAR(45) NOT NULL,
-  `user_surname` VARCHAR(45) NOT NULL,
-  `user_password` VARCHAR(256) NOT NULL,
+  `user_username` VARCHAR(45) NOT NULL,
   `user_email` VARCHAR(45) NOT NULL,
+  `user_school_email` VARCHAR(45) NOT NULL,
+  `user_isStudent` TINYINT NOT NULL DEFAULT 1, 
   `user_img` VARCHAR(256) NULL,
   `user_bio` VARCHAR(180) NULL,
   `user_occupation` VARCHAR(45) NULL,
   `user_github` VARCHAR(256) NULL,
   `user_linkedin` VARCHAR(256) NULL,
   PRIMARY KEY (`user_id`),
-  UNIQUE INDEX `user_email_UNIQUE` (`user_email` ASC) )
+  UNIQUE INDEX `user_email_UNIQUE` (`user_email` ASC), 
+  UNIQUE INDEX `user_username_UNIQUE` (`user_username` ASC),
+  UNIQUE INDEX `user_school_email_UNIQUE` (`user_school_email` ASC)
+  )
 ENGINE = InnoDB;
 
 
