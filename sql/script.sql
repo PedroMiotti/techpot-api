@@ -38,24 +38,45 @@ CREATE TABLE IF NOT EXISTS `techSocial`.`user` (
 ENGINE = InnoDB;
 
 
+
 -- -----------------------------------------------------
--- Table `techSocial`.`grouppot`
+-- Table `techSocial`.`group_privacy_type`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `techSocial`.`grouppot` (
+CREATE TABLE IF NOT EXISTS `techSocial`.`group_privacy_type` (
+  `privacy_type_id` INT NOT NULL,
+  `privacy_type_name` VARCHAR(45) NULL,
+  PRIMARY KEY (`privacy_type_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `techSocial`.`group_pot`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `techSocial`.`group_pot` (
   `group_id` INT NOT NULL AUTO_INCREMENT,
-  `group_name` VARCHAR(90) NOT NULL,
-  `group_desc` VARCHAR(256) NOT NULL,
-  `group_img` VARCHAR(256) NULL,
-  `group_creator_id` INT NULL,
-  `group_roles` VARCHAR(45) NULL,
-  `group_color` VARCHAR(6) NULL,
+  `group_name` VARCHAR(45) NULL,
+  `group_descricao` VARCHAR(120) NULL,
+  `group_img` VARCHAR(45) NULL,
+  `privacy_type_id` INT NULL,
+  `group_data_criacao` DATE NULL,
   PRIMARY KEY (`group_id`),
-  INDEX `group_creator_id_fk_idx` (`group_creator_id` ASC),
-  CONSTRAINT `group_creator_id_fk`
-    FOREIGN KEY (`group_creator_id`)
-    REFERENCES `techSocial`.`user` (`user_id`)
+  UNIQUE INDEX `group_name_UNIQUE` (`group_name` ASC),
+  INDEX `fk_group_privacy_type_id_idx` (`privacy_type_id` ASC) ,
+  CONSTRAINT `fk_group_privacy_type_id`
+    FOREIGN KEY (`privacy_type_id`)
+    REFERENCES `techSocial`.`group_privacy_type` (`privacy_type_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `techSocial`.`group_role_type`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `techSocial`.`group_role_type` (
+  `role_id` INT NOT NULL,
+  `role_name` VARCHAR(45) NULL,
+  PRIMARY KEY (`role_id`))
 ENGINE = InnoDB;
 
 
@@ -65,20 +86,27 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `techSocial`.`group_membership` (
   `group_id` INT NOT NULL,
   `user_id` INT NOT NULL,
-  INDEX `fk_memb_group_idx` (`group_id` ASC),
-  INDEX `fk_memb_user_idx` (`user_id` ASC),
+  `role_id` INT NULL,
   PRIMARY KEY (`group_id`, `user_id`),
-  CONSTRAINT `fk_memb_group`
+  INDEX `fk_group_membership_user_id_idx` (`user_id` ASC) ,
+  INDEX `fk_group_membership_role_id_idx` (`role_id` ASC) ,
+  CONSTRAINT `fk_group_membership_group_id`
     FOREIGN KEY (`group_id`)
-    REFERENCES `techSocial`.`group` (`group_id`)
+    REFERENCES `techSocial`.`group_pot` (`group_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_memb_user`
+  CONSTRAINT `fk_group_membership_user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `techSocial`.`user` (`user_id`)
     ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_group_membership_role_id`
+    FOREIGN KEY (`role_id`)
+    REFERENCES `techSocial`.`group_role_type` (`role_id`)
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
+
 
 
 -- -----------------------------------------------------
@@ -86,46 +114,49 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `techSocial`.`post` (
   `post_id` INT NOT NULL AUTO_INCREMENT,
+  `post_body` MEDIUMTEXT NULL,
+  `post_body_html` MEDIUMTEXT NULL,
   `user_id` INT NULL,
   `group_id` INT NULL,
   PRIMARY KEY (`post_id`),
-  INDEX `fk_post_group_idx` (`group_id` ASC),
-  INDEX `fk_post_user_idx` (`user_id` ASC),
-  CONSTRAINT `fk_post_group`
-    FOREIGN KEY (`group_id`)
-    REFERENCES `techSocial`.`group` (`group_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_post_user`
+  INDEX `fk_post_user_id_idx` (`user_id` ASC) ,
+  INDEX `fk_post_group_id_idx` (`group_id` ASC) ,
+  CONSTRAINT `fk_post_user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `techSocial`.`user` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_post_group_id`
+    FOREIGN KEY (`group_id`)
+    REFERENCES `techSocial`.`group` (`group_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
+
 -- -----------------------------------------------------
--- Table `techSocial`.`comment`
+-- Table `techSocial`.`comment_post`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `techSocial`.`comment` (
-  `comment_id` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `techSocial`.`comment_post` (
+  `comment_id` INT NOT NULL,
+  `comment_body` MEDIUMTEXT NULL,
   `post_id` INT NULL,
   `user_id` INT NULL,
   PRIMARY KEY (`comment_id`),
-  INDEX `fk_comment_user_idx` (`user_id` ASC) ,
-  INDEX `fk_comment_post_idx` (`post_id` ASC),
-  CONSTRAINT `fk_comment_post`
+  INDEX `fk_comment_post_id_idx` (`post_id` ASC) ,
+  INDEX `fk_comment_post_user_id_idx` (`user_id` ASC) ,
+  CONSTRAINT `fk_comment_post_post_id`
     FOREIGN KEY (`post_id`)
     REFERENCES `techSocial`.`post` (`post_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_comment_user`
+  CONSTRAINT `fk_comment_post_user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `techSocial`.`user` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
-
 
 -- -----------------------------------------------------
 -- Table `techSocial`.`friend`
@@ -179,31 +210,29 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `techSocial`.`like`
+-- Table `techSocial`.`like_post`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `techSocial`.`like` (
+CREATE TABLE IF NOT EXISTS `techSocial`.`like_post` (
   `user_id` INT NOT NULL,
   `post_id` INT NOT NULL,
-  INDEX `fk_like_user_idx` (`user_id` ASC) ,
-  INDEX `fk_like_post_idx` (`post_id` ASC),
   PRIMARY KEY (`user_id`, `post_id`),
-  CONSTRAINT `fk_like_user`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `techSocial`.`user` (`user_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_like_post`
+  INDEX `fk_like_post_id_idx` (`post_id` ASC) ,
+  CONSTRAINT `fk_like_post_post_id`
     FOREIGN KEY (`post_id`)
     REFERENCES `techSocial`.`post` (`post_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_like_post_user_id`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `techSocial`.`user` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-
 -- -----------------------------------------------------
 -- Table `techSocial`.`Event_Category`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `techSocial`.`Event_Category` (
+CREATE TABLE IF NOT EXISTS `techSocial`.`event_category` (
   `category_id` INT NOT NULL AUTO_INCREMENT,
   `category_name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`category_id`))
@@ -279,27 +308,25 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `techSocial`.`group_list`
+-- Table `techSocial`.`group_invite_list`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `techSocial`.`group_list` (
-  `group_list_id` INT NOT NULL,
-  `group_id` INT NULL,
-  `user_id` INT NULL,
-  INDEX `fk_eventList_user_idx` (`user_id` ASC) ,
-  PRIMARY KEY (`group_list_id`),
-  INDEX `fk_groupList_event_idx` (`group_id` ASC) ,
-  CONSTRAINT `fk_groupList_user`
+CREATE TABLE IF NOT EXISTS `techSocial`.`group_invite_list` (
+  `group_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `group_invite_confirm` TINYINT NULL DEFAULT 0,
+  PRIMARY KEY (`group_id`, `user_id`),
+  INDEX `fk_group_invite_list_user_id_idx` (`user_id` ASC) ,
+  CONSTRAINT `fk_group_invite_list_user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `techSocial`.`user` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_groupList_event`
+  CONSTRAINT `fk_group_invite_list_group_id`
     FOREIGN KEY (`group_id`)
-    REFERENCES `techSocial`.`group` (`group_id`)
+    REFERENCES `techSocial`.`group_pot` (`group_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
-
 
 
 
