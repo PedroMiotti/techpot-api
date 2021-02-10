@@ -23,7 +23,7 @@ router.post("/login", async (req, res) => {
 // --> Criar Usuario
 router.post("/criar", async (req, res) => {
     let u = req.body;
-
+    console.log(u);
     await Usuario.createUser(u, res);
 
 });
@@ -32,14 +32,16 @@ router.post("/criar", async (req, res) => {
 router.get("/info/:id", async (req, res) => {
     let id = req.params.id;
 
-    // await Usuario.infoUser(id, res);
     await Usuario.infoUser(id, res);
 })
 
 // --> Editar usuario
 router.post("/editar", async (req, res) => {
     let u = req.body;
-    await Usuario.updateUser(u, res);
+    let id = u.id;
+    let userInfo = u.userInfo;
+
+    await Usuario.updateUser(id, userInfo, res);
 
 })
 

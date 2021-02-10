@@ -1,7 +1,7 @@
 // Format date to --> yyyy-mm-dd
 
-function format_date(date_now){
-    let date = new Date(date_now);
+function format_date(){
+    let date = new Date();
 
     let ano = date.getFullYear();
     let mes = date.getMonth() + 1;
@@ -21,5 +21,6 @@ function format_date(date_now){
 
     return date_formated
 }
+
 
 module.exports = format_date;

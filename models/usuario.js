@@ -1,8 +1,6 @@
 "use strict";
 
 // IMPORTS
-// Express
-const express = require('express');
 //JWT
 const jwt = require('jsonwebtoken');
 //Dotenv
@@ -16,27 +14,26 @@ const sendConfirmationEmail = require('../helpers/AuthEmail');
 
 
 class Usuario {
-    constructor(id, nome, sobrenome, bio, email, senha, img, ocupacao, linkedin, github, instagram) {
+    constructor(id, name, surname, bio, email, password, image, occupation, linkedin, github) {
         this.id = id;
-        this.nome = nome;
-        this.sobrenome = sobrenome;
+        this.name = name;
+        this.surname = surname;
         this.bio = bio;
         this.email = email;
-        this.senha = senha;
-        this.ocupacao = ocupacao;
-        this.img = img;
+        this.password = password;
+        this.occupation = occupation;
+        this.image = image;
         this.linkedin = linkedin;
         this.github = github;
-        this.instagram = instagram;
     }
 
 
     // --> Gerar token 
-    static genToken(id, nome) {
+    static genToken(id, name) {
 
         let u = new Usuario;
         u.id = id;
-        u.nome = nome;
+        u.name = name;
 
         const token = jwt.sign({ u }, process.env.JWT_SECRET, { expiresIn: 31536000 })
 
@@ -45,22 +42,22 @@ class Usuario {
     }
 
     // --> Efetuar login
-    static async login(email, senha, res) {
+    static async login(email, password, res) {
 
-        if (!email || !senha) return res.status(400).send({ message: "Usuário ou senha inválidos ! :(" });
+        if (!email || !password) return res.status(400).send({ message: "Usuário ou password inválidos ! :(" });
 
 
         await Sql.conectar(async (sql) => {
 
-            let resp = await sql.query("SELECT user_id, user_name, user_password FROM user WHERE user_mail = ? ", [email]);
+            let resp = await sql.query("SELECT user_id, user_name, user_password FROM user WHERE user_email = ? ", [email]);
             let row = resp[0];
 
 
             if (!resp || !resp.length) return res.status(400).send({ message: "Usuário ou senha inválidos ! :(" })
 
 
-            const validPassword = bcrypt.compare(senha, row.user_password);
-            if (!validPassword) return res.status(400).send({ message: "Usuário ou senha inválidos ! :(" });
+            const validPassword = bcrypt.compare(password, row.user_password);
+            if (!validPassword) return res.status(400).send({ message: "Usuário ou password inválidos ! :(" });
 
             const token = Usuario.genToken(row.user_id, row.user_name);
 
@@ -80,26 +77,28 @@ class Usuario {
             TODO --> Check if email exists on DB and treat duplicate error
             TODO --> Password validation ( Front ? )
             TODO --> Send error message if the email is not found -- Error: No recipients defined (NodeMailer error)
-            ? REQUIRED FIELDS --> Nome, sobrenome, email, senha;
+            ? REQUIRED FIELDS --> Nome, surname, email, password;
 
         */
 
         let message;
         let statusCode;
         let token;
+        let firstAccess;
 
         await Sql.conectar(async (sql) => {
             try {
 
                 let hash = bcrypt.hashSync(u.senha, parseInt(process.env.SALT_ROUNDS));
 
-                await sql.query("INSERT INTO user (user_name, user_surname,user_password, user_mail, user_img, user_bio, user_job, user_git, user_linkedin, user_instagram) VALUES(?, ? ,?, ?, ?, ?, ?, ?, ?, ?)", [u.nome, u.sobrenome, hash, u.email, 1, u.bio, u.ocupacao, u.github, u.linkedin, u.instagram])
+                await sql.query("INSERT INTO user (user_name, user_surname,user_password, user_email, user_img, user_bio, user_occupation, user_github, user_linkedin) VALUES(?, ? ,?, ?, ?, ?, ?, ?, ?)", [u.nome, u.sobrenome, hash, u.email, 1, u.bio, u.occupation, u.github, u.linkedin ])
 
                 // sendConfirmationEmail(u.email);
 
-                token = Usuario.genToken(sql.lastInsertedId, u.nome);
+                token = Usuario.genToken(sql.lastInsertedId, u.name);
                 statusCode = 201;
-                message = `Bem vindo a comunidade TECH ${u.nome} !`;
+                message = `Bem vindo a comunidade TECH ${u.name} !`;
+                firstAccess = true;
 
 
             } catch (e) {
@@ -108,6 +107,7 @@ class Usuario {
                     message = `Opsss, o email ${u.email} já está em uso, deseja fazer login ou recuperar sua senha ?`;
                     token = null;
                     statusCode = 400;
+                    firstAccess = null;
                 }
 
                 else {
@@ -115,7 +115,7 @@ class Usuario {
                 }
             }
 
-            return res.status(statusCode).send({ token, message });
+            return res.status(statusCode).send({ token, message, firstAccess });
         });
 
     }
@@ -148,13 +148,12 @@ class Usuario {
             if (!resp || !resp.length) return res.status(400).send({ message: "Usuário não encontrado !" })
 
             let u = new Usuario;
-            u.nome = row.user_name;
-            u.sobrenome = row.user_surname;
+            u.name = row.user_name;
+            u.surname = row.user_surname;
             u.bio = row.user_bio;
-            u.email = row.user_mail;
-            u.ocupacao = row.user_job;
-            u.github = row.user_git;
-            u.instagram = row.user_instagram;
+            u.email = row.user_email;
+            u.occupation = row.user_occupation;
+            u.github = row.user_github;
             u.linkedin = row.user_linkedin;
 
             return res.status(200).send({ u })
@@ -164,27 +163,24 @@ class Usuario {
 
 
     // --> Editar Usuario
-    static async updateUser(u, res) {
+    static async updateUser(id, u, res) {
         let message;
         let statusCode;
         let token;
 
-        // if(!u.id) return res.status(400).send({message: "Usuário não encontrado !"});
+        if(!id) return res.status(400).send({message: "Usuário não encontrado !"});
+        // TODO --> Check if id exists
 
         await Sql.conectar(async (sql) => {
-            let id = parseInt(u.id);
-            await sql.query("UPDATE user SET user_name = ?, user_surname = ?, user_bio = ?, user_job= ?, user_git = ?, user_linkedin = ? WHERE user_id = ?", [u.nome, u.sobrenome, u.bio, u.ocupacao, u.github, u.linkedin, id]);
+            await sql.query("UPDATE user SET user_name = ?, user_surname = ?, user_bio = ?, user_occupation= ?, user_github = ?, user_linkedin = ? WHERE user_id = ?", [u.nome, u.sobrenome, u.bio, u.ocupacao, u.github, u.linkedin, parseInt(id)]);
 
-            token = Usuario.genToken(id, u.nome);
+
+            token = Usuario.genToken(parseInt(id), u.name);
             statusCode = 200;
             message = "Usuario salvo com sucesso !";
 
-
             return res.status(200).send({ token, message })
-
-
         })
-
 
     }
 
