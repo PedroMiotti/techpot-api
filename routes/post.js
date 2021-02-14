@@ -31,5 +31,25 @@ router.get("/feed/grupo/listar/:id", async (req, res) => {
     await Post.listPostsByGroup(id, res);
 })
 
+// --> Like post
+router.post('/like', async (req, res) => {
 
+  let user_id = req.body.user_id;
+  let post_id = req.body.post_id;
+  
+  await Post.likePost(user_id, post_id, res);
+
+
+})
+
+// --> unlike post
+router.post('/unlike', async (req, res) => {
+
+  let user_id = req.body.user_id;
+  let post_id = req.body.post_id;
+  
+  await Post.unlikePost(user_id, post_id, res);
+
+
+})
 module.exports = router;

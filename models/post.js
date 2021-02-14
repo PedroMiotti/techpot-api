@@ -41,11 +41,12 @@ class Post {
 
   static async listPostsByUser(user_id, res) {
     let lista = [];
+    let postsUserLiked = []; 
 
     await Sql.conectar(async (sql) => {
       try {
         lista = await sql.query(
-          `SELECT p.post_id, p.post_body, p.post_body_html, p.post_create_date, g.group_name, u.user_id,u.user_name
+          `SELECT p.post_id, p.post_body, p.post_body_html, p.post_like_count ,p.post_create_date, g.group_name, u.user_id,u.user_name
                                 FROM post p
                                 INNER JOIN user u 
                                 ON p.user_id = u.user_id
@@ -55,13 +56,18 @@ class Post {
                                 ORDER BY p.post_id DESC`,
           [parseInt(user_id)]
         );
+        
+        postsUserLiked = await sql.query(`SELECT user_id, post_id FROM like_post WHERE user_id = ?`, [user_id]);
+
+        console.log(postsUserLiked)
+
       } catch (e) {
         return res.status(400).send({
           message: `Erro ao listar posts: ${e}`,
         });
       }
 
-      return res.status(201).send(lista);
+      return res.status(201).send( lista );
     });
   }
 
@@ -71,7 +77,7 @@ class Post {
     await Sql.conectar(async (sql) => {
       try {
         lista = await sql.query(
-          `SELECT p.post_id, p.post_body, p.post_body_html, p.post_create_date, g.group_name, u.user_id, u.user_name
+          `SELECT p.post_id, p.post_body, p.post_body_html, p.post_create_date, p.post_like_count, g.group_name, u.user_id, u.user_name
                                         FROM post p
                                         INNER JOIN user u 
                                         ON p.user_id = u.user_id
@@ -96,8 +102,44 @@ class Post {
     if(!user_id || !post_id) return res.status(400).send({message : 'Ops algo deu errado'});
 
     await Sql.conectar(async (sql) => {
-       
+      
+      try{
+        
+        await sql.query(`INSERT INTO like_post (post_id, user_id) VALUES (?, ?)`, [post_id, user_id]);
+
+        await sql.query(`UPDATE post SET post_like_count = (SELECT COUNT(*) FROM like_post WHERE post_id = ?) WHERE post_id = ? `, [post_id, post_id]); 
+      }
+      catch(e){
+        
+        console.log(e);
+  
+      }
+
+      return res.status(200).send('Post Liked');
+
     }) 
+  }
+
+  static async unlikePost(user_id, post_id, res){
+    
+    
+    if(!user_id || !post_id) return res.status(400).send({message : 'Ops algo deu errado ... unlikePostFunction'});
+
+    await Sql.conectar(async (sql) => {
+      
+      try{
+        
+        await sql.query(`DELETE FROM like_post WHERE user_id = ? AND post_id = ?`, [user_id, post_id]);
+
+      }
+      catch(e){
+        console.log(e);
+      }
+
+      return res.status(204).send('Post unliked');
+      
+
+    })
   }
 
 }

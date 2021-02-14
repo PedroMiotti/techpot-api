@@ -122,6 +122,7 @@ CREATE TABLE IF NOT EXISTS `techpotDB`.`post` (
   `post_body` MEDIUMTEXT NULL,
   `post_body_html` MEDIUMTEXT NULL,
   `post_create_date` TIMESTAMP NOT NULL DEFAULT NOW(),
+  `post_like_count` INT NULL,
   `user_id` INT NULL,
   `group_id` INT NULL,
   PRIMARY KEY (`post_id`),

@@ -3,7 +3,7 @@
 -- rodar só uma vez (campo email tem restrição unique)
 insert into user (user_name , user_username, user_email, user_school_email, user_isstudent)
 	values ("fernanda", "fernanda.shinoda", "fernanda.shinoda@mail", "fernanda.shinoda@acad.espm.br",1);
-insert into user (user_name , user_username,user_surname,  user_email, user_school_email, user_isstudent)
+insert into user (user_name , user_username, user_email, user_school_email, user_isstudent)
 	values ("pedro", "pedro.miotti",  "pedro.miotti@mail", "pedro.miotti@acad.espm.br",1);
 insert into user (user_name , user_username, user_email, user_school_email, user_isstudent)
 	values ("joão","joao.kitajima","joao.kitajima@mail", "joao.kitajima@acad.espm.br",1);
