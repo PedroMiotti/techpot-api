@@ -56,7 +56,7 @@ class Usuario {
       return res.status(400).send({ message: "Ops algo deu errado " });
 
     axios
-      .get(`https://credenciamento.espm.br/ad/token/${token}`)
+      .get(`https://credenciamento.espm.br/ad/teste-token/${token}`)
       .then(async (response) => {
         
         let id_user;

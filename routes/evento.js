@@ -61,7 +61,6 @@
 
     //listar todas as info de um evento
     router.get("/:id", async (req,res) =>{
-      console.log('oi')
         await Evento.infoEvento(req.params.id, res);
     }) 
 
