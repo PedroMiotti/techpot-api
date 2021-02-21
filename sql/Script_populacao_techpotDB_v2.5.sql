@@ -1,12 +1,12 @@
 ﻿-- SCRIPT DE POPULACAO DAS TABELAS - DEV
 
--- Rodar só uma vez (campo email tem restrição Unique)
-INSERT INTO user (user_name, user_surname, user_password, user_email)
-	VALUES ("Fernanda", "Shinoda", "1234", "fernanda.shinoda@mail");
-INSERT INTO user (user_name, user_surname, user_password, user_email)
-	VALUES ("Pedro", "Miotti", "5678", "pedro.miotti@mail");
-INSERT INTO user (user_name, user_surname, user_password, user_email)
-	VALUES ("João", "Kitajima", "91011", "joao.kitajima@mail");
+-- rodar só uma vez (campo email tem restrição unique)
+insert into user (user_name , user_username, user_email, user_school_email, user_isstudent)
+	values ("fernanda", "fernanda.shinoda", "fernanda.shinoda@mail", "fernanda.shinoda@acad.espm.br",1);
+insert into user (user_name , user_username, user_email, user_school_email, user_isstudent)
+	values ("pedro", "pedro.miotti",  "pedro.miotti@mail", "pedro.miotti@acad.espm.br",1);
+insert into user (user_name , user_username, user_email, user_school_email, user_isstudent)
+	values ("joão","joao.kitajima","joao.kitajima@mail", "joao.kitajima@acad.espm.br",1);
 -- select * from user;
 
 
