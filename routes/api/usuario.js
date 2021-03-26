@@ -6,7 +6,7 @@ const express = require('express');
 const router = express.Router();
 
 //MODEL
-const Usuario = require('../models/usuario');
+const Usuario = require('../../models/usuario');
 
 
 // ROTAS
@@ -30,32 +30,35 @@ router.post("/login", async (req, res) => {
 
 
 // --> Criar Usuario
-router.post("/criar", async (req, res) => {
+router.post("/", async (req, res) => {
     let u = req.body;
-    console.log(u);
+    
     await Usuario.createUser(u, res);
 
 });
 
 // --> Info Usuario
-router.get("/info/:id", async (req, res) => {
-    let id = req.params.id;
+router.get("/:id", async (req, res) => {
+    let { id } = req.params;
 
-    await Usuario.infoUser(id, res);
+    let resp = await Usuario.infoUser(id);
+
+    res.status(parseInt(resp.status)).send(resp.send);
 })
 
 // --> Editar usuario
-router.post("/editar", async (req, res) => {
+router.put("/:id", async (req, res) => {
+    let { id } = req.params;
     let u = req.body;
-    let id = u.id;
-    let userInfo = u.userInfo;
-
-    await Usuario.updateUser(id, userInfo, res);
+    await Usuario.updateUser(id, u, res);
 
 })
 
+// --> Deletar Usuario
+router.delete('/:id', async (res, req) => {});
+
 // --> Confirmar E-mail
-router.post("/confirm-email/:token"), async (req, res) => { }
+router.post("/confirm-email/:token", async (req, res) => { });
 
 
 

@@ -12,7 +12,7 @@ const bcrypt = require("bcryptjs");
 // SQL
 const Sql = require("../infra/sql");
 //Helpers
-const sendConfirmationEmail = require("../helpers/AuthEmail");
+// const sendConfirmationEmail = require("../helpers/AuthEmail");
 
 class Usuario {
   constructor(
@@ -56,7 +56,7 @@ class Usuario {
       return res.status(400).send({ message: "Ops algo deu errado " });
 
     axios
-      .get(`https://credenciamento.espm.br/ad/teste-token/${token}`)
+      .get(`https://credenciamento.espm.br/ad/token/${token}`)
       .then(async (response) => {
         
         let id_user;
@@ -216,31 +216,43 @@ class Usuario {
   }
 
   // --> Info Usuario
-  static async infoUser(id, res) {
-    if (!id)
-      return res.status(400).send({ message: "Usuário não encontrado !" });
+  static async infoUser(id) {
+    let respMessage;
+    let statusCode;
+
+    if (!id){
+        respMessage = {  message: "Usuário não encontrado !"  };
+        statusCode = 400;
+    }
 
     await Sql.conectar(async (sql) => {
       let resp = await sql.query("SELECT * FROM user WHERE user_id = ?", [id]);
+      
       let row = resp[0];
+      
+      if (!resp || !resp.length){
+        respMessage = {  message: "Usuário não encontrado !"  };
+        statusCode = 400;
+      }
+      else{
+        let u = new Usuario();
+        u.name = row.user_name;
+        u.username = row.user_username;
+        u.email = row.user_email;
+        u.school_email = row.user_school_email;
+        u.isStudent = row.user_isStudent;
+        u.bio = row.user_bio;
+        u.email = row.user_email;
+        u.occupation = row.user_occupation;
+        u.github = row.user_github;
+        u.linkedin = row.user_linkedin;
 
-      if (!resp || !resp.length)
-        return res.status(400).send({ message: "Usuário não encontrado !" });
-
-      let u = new Usuario();
-      u.name = row.user_name;
-      u.username = row.user_username;
-      u.email = row.user_email;
-      u.school_email = row.user_school_email;
-      u.isStudent = row.user_isStudent;
-      u.bio = row.user_bio;
-      u.email = row.user_email;
-      u.occupation = row.user_occupation;
-      u.github = row.user_github;
-      u.linkedin = row.user_linkedin;
-
-      return res.status(200).send({ u });
+        respMessage = { u };
+        statusCode = 200;
+      }
     });
+
+    return {status: statusCode, send: respMessage };
   }
 
   // --> Editar Usuario
@@ -249,6 +261,7 @@ class Usuario {
     let statusCode;
     let token;
 
+    console.log(u);
     if (!id)
       return res.status(400).send({ message: "Usuário não encontrado !" });
     // TODO --> Check if id exists

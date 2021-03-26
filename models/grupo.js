@@ -24,7 +24,7 @@ class Grupo {
   // MÉTODOS
 
   //listar eventos - lista em ordem de data crescente.
-  static async listarGrupos(id, res) {
+  static async listUserGroups(id, res) {
     let lista = [];
 
     await Sql.conectar(async (sql) => {
@@ -48,14 +48,14 @@ class Grupo {
   }
 
   // Criar grupo
-  static async criarGrupo(g, res) {
+  static async createGroup(g, res) {
     let message;
 
     await Sql.conectar(async (sql) => {
       try {
         await sql.query(
           "INSERT INTO group_pot (group_name, group_desc, group_members_count, group_img, privacy_type_id) VALUES (?, ?, ?, ?, ?)",
-          [g.name, g.description, 1, 1,parseInt(g.privacy_type)]
+          [g.name, g.description, 1, 1, parseInt(g.privacy_type)]
         );
 
         const id_grupo = await sql.scalar("SELECT last_insert_id()");
@@ -79,11 +79,13 @@ class Grupo {
   }
 
   // Info Grupo
-  static async infoGrupo(id, res) {
+  static async infoGroup(id, res) {
     if (!id) return res.status(400).send({ message: "Grupo não encontrado !" });
 
     await Sql.conectar(async (sql) => {
-      let resp = await sql.query('SELECT * FROM group_pot WHERE group_id = ?',[id]);
+      let resp = await sql.query("SELECT * FROM group_pot WHERE group_id = ?", [
+        id,
+      ]);
       let row = resp[0];
 
       if (!resp || !resp.length)
@@ -102,13 +104,14 @@ class Grupo {
     });
   }
 
+  // Not working - TODO --> Fix
   // Atualizar grupo
-  static async atualizarGrupo(req, res) {
+  static async editGroup(id, g, res) {
     await Sql.conectar(async (sql) => {
       try {
         await sql.query(
           "UPDATE group SET group_name = ?, group_desc = ?, group_img = ?, group_color = ? WHERE group_id = ?",
-          [req.nome, req.descricao, req.foto, req.cor_banner, req.id]
+          [g.nome, g.descricao, g.foto, g.cor_banner, g.id]
         );
       } catch (err) {
         return res.status(400).send({
@@ -123,7 +126,7 @@ class Grupo {
   }
 
   // Deletar grupo
-  static async deletarGrupo(id, res) {
+  static async deleteGroup(id, res) {
     await Sql.conectar(async (sql) => {
       try {
         await sql.query(`DELETE FROM group WHERE group_id = ${id}`);
@@ -139,8 +142,8 @@ class Grupo {
     });
   }
 
-  // Listar membros
-  static async listarMembros(id, res) {
+  // Listar membros -- Not working
+  static async listMembers(id, res) {
     let membros = [];
 
     try {
@@ -148,16 +151,16 @@ class Grupo {
         `SELECT user_id FROM group_membership WHERE group_id = ${id}`
       );
     } catch (err) {
-      return res.status(400).send({
-        message: `${err} - Grupo não encontrado.`,
-      });
-    } finally {
-      return res.status(201).send(membros);
+      return res
+        .status(400)
+        .send({ message: `${err} - grupo não encontrado.` });
     }
+
+    return res.status(201).send(membros);
   }
 
-  // Listar todos os grupos existentes na TechPot
-  static async listarTodosOsGrupos(res) {
+  // Listar todos os grupos existentes -- Not working 
+  static async listAllGroups(res) {
     let grupos = [];
 
     try {
@@ -171,8 +174,8 @@ class Grupo {
     }
   }
 
-  // Entrar em grupo
-  static async entrarEmGrupo() {}
+  // Entrar em grupo -- Not working
+  static async joinGroup() {}
 }
 
 module.exports = Grupo;

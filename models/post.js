@@ -137,7 +137,7 @@ class Post {
         console.log(e);
       }
 
-      return res.status(204).send('Post unliked');
+      return res.status(200).send('Post unliked');
       
 
     })
