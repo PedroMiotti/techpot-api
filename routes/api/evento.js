@@ -8,6 +8,12 @@ const router = express.Router();
 //MODEL
 const Evento = require('../../models/evento');
 
+//Criar Evento - 
+router.post("/", async (req, res) =>{
+    let e = req.body;
+    await Evento.criarEvento(e, res)
+    
+});
 
 //listar as categorias disponiveis
 router.get("/listar-categorias", async (req, res) =>{
@@ -33,13 +39,6 @@ router.get("/listar/:catId", async (req, res) => {
 router.delete("/:id", async (req, res) => {
     await Evento.deletarEvento(req.params.id, res);
 })
-
-//Criar Evento - 
-router.post("/criar", async (req, res) =>{
-    let e = req.body;
-    await Evento.criarEvento(e, res)
-    
-});
 
 //Atualizar Evento 
 router.put("/atualizar", async (req, res) =>{

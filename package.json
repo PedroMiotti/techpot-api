@@ -8,10 +8,10 @@
     "dev": "nodemon server.js"
   },
   "jest": {
-      "testEnvironment": "node",
-      "coveragePathIgnorePatterns": [
-        "/node_modules/"
-      ]
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   },
   "author": "",
   "license": "MIT",
@@ -23,7 +23,7 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
-    "nodemailer": "^6.4.15",
+    "nodemailer": "^6.6.1",
     "nodemailer-express-handlebars": "^4.0.0"
   },
   "devDependencies": {

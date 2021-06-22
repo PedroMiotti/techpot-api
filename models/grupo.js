@@ -10,7 +10,9 @@ class Grupo {
     privacy_type,
     image,
     create_date,
-    num_members
+    num_members,
+    members_list
+
   ) {
     this.id = id;
     this.name = name;
@@ -19,11 +21,12 @@ class Grupo {
     this.privacy_type = privacy_type;
     this.create_date = create_date;
     this.num_members = num_members;
+    this.members_list = members_list;
   }
 
   // MÉTODOS
 
-  //listar eventos - lista em ordem de data crescente.
+  //listar grupos
   static async listUserGroups(id, res) {
     let lista = [];
 
@@ -83,14 +86,18 @@ class Grupo {
     if (!id) return res.status(400).send({ message: "Grupo não encontrado !" });
 
     await Sql.conectar(async (sql) => {
-      let resp = await sql.query("SELECT * FROM group_pot WHERE group_id = ?", [
-        id,
-      ]);
+      let resp = await sql.query("SELECT * FROM group_pot WHERE group_id = ?", [id]);
       let row = resp[0];
+
+      let g_members = await sql.query(`SELECT m.role_id, u.user_name, u.user_username, u.user_id, u.user_img
+                                      FROM group_membership m
+                                      INNER JOIN user u 
+                                      ON u.user_id = m.user_id
+                                      WHERE m.group_id = 2;`)
 
       if (!resp || !resp.length)
         return res.status(400).send({ message: "Grupo não encontrado !" });
-
+ 
       let g = new Grupo();
       g.id = row.group_id;
       g.name = row.group_name;
@@ -99,6 +106,7 @@ class Grupo {
       g.privacy_type = row.privacy_type_id;
       g.create_date = row.group_create_date;
       g.num_members = row.group_members_count;
+      g.members_list = g_members;
 
       return res.status(200).send({ g });
     });

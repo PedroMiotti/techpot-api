@@ -17,7 +17,8 @@ class Evento {
     creatorId,
     creatorName,
     creatorSurname,
-    creatorOccupation
+    creatorOccupation,
+    creatorUsername
   ) {
     this.id = id;
     this.name = name;
@@ -32,6 +33,7 @@ class Evento {
     this.creatorId = creatorId;
     this.creatorName = creatorName;
     this.creatorSurname = creatorSurname;
+    this.creatorUsername = creatorUsername; 
     this.creatorOccupation = creatorOccupation;
   }
 
@@ -191,7 +193,7 @@ class Evento {
 
     await Sql.conectar(async (sql) => {
       let info = await sql.query(
-        "select event_id, event_name, event_desc, event_dateInit, event_img, e.category_id, ec.category_name,  event_dateEnd, e.event_type_id, event_creator_id, et.event_type_name, u.user_name, u.user_occupation from event e inner join event_type et on e.event_type_id = et.event_type_id inner join event_category ec on ec.category_id = e.category_id inner join user u on u.user_id = e.event_creator_id where event_id = ?;",
+        "select event_id, event_name, event_desc, event_dateInit, event_img, e.category_id, ec.category_name,  event_dateEnd, e.event_type_id, event_creator_id, et.event_type_name, u.user_name, u.user_username, u.user_occupation from event e inner join event_type et on e.event_type_id = et.event_type_id inner join event_category ec on ec.category_id = e.category_id inner join user u on u.user_id = e.event_creator_id where event_id = ?;",
         [parseInt(id)]
       );
       let row = info[0];
