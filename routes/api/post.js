@@ -50,8 +50,19 @@ router.put('/unlike/post/:id/user/:userid', async (req, res) => {
   
   await Post.unlikePost(user_id, post_id, res);
 
+})
+
+// --> Comment post
+router.post('/comment/post/:id/user/:userid', async (req, res) => {
+    let post_id = req.params.id;
+    let user_id = req.params.userid;
+    const { comment_body } = req.body;
+
+    await Post.createComment(user_id, post_id, comment_body , res);
 
 })
+
+
 
 
 module.exports = router;
