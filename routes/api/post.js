@@ -13,7 +13,7 @@ const Post = require('../../models/post');
 // --> Criar Post
 router.post("/", async (req, res) => {
     let p = req.body;
-  
+
     await Post.createPost(p, res);
 
 })
@@ -59,6 +59,14 @@ router.post('/comment/post/:id/user/:userid', async (req, res) => {
     const { comment_body } = req.body;
 
     await Post.createComment(user_id, post_id, comment_body , res);
+
+})
+
+// --> List comments by post id
+router.get('/comment/post/:id', async (req, res) => {
+    let post_id = req.params.id;
+
+    await Post.getCommentsByPost(post_id, res);
 
 })
 

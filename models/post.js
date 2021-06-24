@@ -43,15 +43,18 @@ class Post {
 
     await Sql.conectar(async (sql) => {
       try {
-        listPosts = await sql.query(
-          `SELECT p.post_id, p.post_body, p.post_body_html, p.post_like_count, p.post_comment_count ,p.post_create_date, g.group_name, u.user_id,u.user_name
-                                FROM post p
-                                INNER JOIN user u 
-                                ON p.user_id = u.user_id
-                                INNER JOIN group_pot g
-                                ON p.group_id = g.group_id
-                                WHERE g.group_id IN (SELECT group_id FROM group_membership WHERE user_id = ? ) 
-                                ORDER BY p.post_id DESC`,
+        listPosts = await sql.query("SELECT p.post_id, p.post_body, p.post_body_html, p.post_like_count, p.post_comment_count ,p.post_create_date, g.group_name, u.user_id, u.user_name, c.comment_id, c.comment_body, c.comment_date, uc.user_id as comment_user_id, uc.user_name as comment_user_name\n" +
+            "FROM post p\n" +
+            "INNER JOIN user u \n" +
+            "ON p.user_id = u.user_id\n" +
+            "INNER JOIN group_pot g\n" +
+            "ON p.group_id = g.group_id\n" +
+            "INNER JOIN (SELECT MAX(comment_date) as comment_date, comment_id, comment_body, user_id, post_id FROM comment_post group by post_id) c\n" +
+            "ON p.post_id = c.post_id\n" +
+            "INNER JOIN user uc\n" +
+            "ON c.user_id = uc.user_id\n" +
+            "WHERE g.group_id IN (SELECT group_id FROM group_membership WHERE user_id = ? ) \n" +
+            "ORDER BY p.post_id DESC;\n",
           [parseInt(user_id)]
         );
     
@@ -71,34 +74,30 @@ class Post {
 
   static async listPostsByGroup(group_id, res) {
     let post_list = [];
-    let comments_list = [];
 
+    // TODO -> Add validation if the group exists
     await Sql.conectar(async (sql) => {
       try {
-        post_list = await sql.query("SELECT p.post_id, p.post_body, p.post_body_html, p.post_create_date, p.post_like_count, p.post_comment_count, g.group_name, u.user_id, u.user_name\n" +
+        post_list = await sql.query("SELECT p.post_id, p.post_body, p.post_body_html, p.post_create_date, p.post_like_count, g.group_name, u.user_id, u.user_name, c.comment_id, c.comment_body, c.comment_date, uc.user_id as comment_user_id, uc.user_name as comment_user_name\n" +
             "FROM post p\n" +
             "INNER JOIN user u \n" +
             "ON p.user_id = u.user_id\n" +
             "INNER JOIN group_pot g\n" +
             "ON p.group_id = g.group_id\n" +
-            "WHERE p.group_id = ?\n" +
-            "ORDER BY p.post_id DESC;",
-          [parseInt(group_id)]
-        );
-
-        comments_list = await sql.query("SELECT c.comment_id, c.comment_body, c.comment_date, uc.user_id, uc.user_name, p.post_id, p.group_id\n" +
-            "FROM comment_post c\n" +
+            "INNER JOIN (SELECT MAX(comment_date) as comment_date, comment_id, comment_body, user_id, post_id FROM comment_post group by post_id) c\n" +
+            "ON p.post_id = c.post_id\n" +
             "INNER JOIN user uc\n" +
             "ON c.user_id = uc.user_id\n" +
-            "INNER JOIN post p\n" +
-            "ON c.post_id = p.post_id\n" +
-            "WHERE p.group_id = ?;", [parseInt(group_id)]);
+            "WHERE p.group_id = 2\n" +
+            "ORDER BY p.post_create_date ASC;",
+          [parseInt(group_id)]
+        );
 
       } catch (e) {
         return res.status(400).send({message: `Erro ao listar posts: ${e}`,});
       }
 
-      return res.status(201).send({post_list, comments_list});
+      return res.status(201).send(post_list);
     });
   }
 
@@ -182,8 +181,12 @@ class Post {
       try{
 
         // TODO -> Pagination
-        let row = await sql.query("SELECT * FROM comment_post WHERE post_id = ? ", [post_id]);
-        comments = row[0];
+        comments = await sql.query("SELECT c.* , uc.user_id, uc.user_name\n" +
+            "FROM comment_post c\n" +
+            "INNER JOIN user uc\n" +
+            "ON c.user_id = uc.user_id\n" +
+            "WHERE c.post_id = ? \n" +
+            "ORDER BY c.comment_date DESC;", [post_id]);
 
       }
       catch(e){

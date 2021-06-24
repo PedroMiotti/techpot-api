@@ -68,8 +68,19 @@ class Evento {
   }
 
   //criar evento
-  static async criarEvento(e, res) {
+  static async criarEvento(event, res) {
     let message;
+
+    let e = new Evento();
+    e.name = event.nome;
+    e.description = event.descricao;
+    e.dateInit = event.data_inicio;
+    e.dateEnd = event.data_fim;
+    e.image = event.imagemUrl;
+    e.categoryId = event.categoriaId;
+    e.typeId = event.tipoId;
+    e.creatorId = event.criador;
+
     if (!e.name || !e.description || !e.dateInit) {
       message = `Erro: Preencha os campos obrigatórios`;
       return res.status(400).send({ message });
@@ -87,7 +98,7 @@ class Evento {
             parseInt(e.categoryId),
             e.dateEnd,
             parseInt(e.typeId),
-            e.criador,
+            e.creatorId,
           ]
         );
       } catch (e) {

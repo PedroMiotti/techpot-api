@@ -11,8 +11,8 @@ const Evento = require('../../models/evento');
 //Criar Evento - 
 router.post("/", async (req, res) =>{
     let e = req.body;
+
     await Evento.criarEvento(e, res)
-    
 });
 
 //listar as categorias disponiveis
