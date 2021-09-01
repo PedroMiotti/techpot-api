@@ -36,6 +36,7 @@ class Post {
         });
     }
 
+    // --> Listar posts para um usuario
     static async listPostsByUser(user_id, res) {
         let listPosts = [];
         let postsUserLiked = [];
